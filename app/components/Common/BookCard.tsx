@@ -1,6 +1,11 @@
 import Card from "./Card";
+import type { Book } from "../types";
 
-export default function BookCard({ book }) {
+interface BookCardProps {
+  book: Book;
+}
+
+export default function BookCard({ book }: BookCardProps) {
   return (
     <Card hover>
       <h3>{book.name}</h3>

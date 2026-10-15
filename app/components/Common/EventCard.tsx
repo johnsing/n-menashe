@@ -1,4 +1,10 @@
-export default function EventCard({ event }) {
+import type { CalendarEvent } from "../types";
+
+interface EventCardProps {
+  event: CalendarEvent;
+}
+
+export default function EventCard({ event }: EventCardProps) {
   const d = new Date(event.date);
   return (
     <div className="event">

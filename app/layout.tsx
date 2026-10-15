@@ -1,19 +1,26 @@
-import type { ReactNode } from "react";
-import Nav from "./components/Nav";
-import TabBar from "./components/TabBar";
-import "./globals.css";
+// app/layout.tsx
+import StyledComponentsRegistry from '@/app/lib/registry';
+import Nav from '@/app/components/Header/Nav';
+import TabBar from '@/app/components/Header/TabBar';
+import './globals.css';
 
 export const metadata = {
-  title: "Nishmat-Menashe",
-  description: "Bible library, videos, audio, Q&A, and calendar",
+  title: 'Zmanim Train Line',
+  description: 'Chronological transit schedule for halachic times',
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en">
+    <html>
+      <Nav />
       <body>
-        <Nav />
-        <main className="container">{children}</main>
+        <StyledComponentsRegistry>
+          {children}
+        </StyledComponentsRegistry>
         <TabBar />
       </body>
     </html>

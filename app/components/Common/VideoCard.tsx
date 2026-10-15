@@ -1,6 +1,11 @@
 import Card from "./Card";
+import type { Video } from "../../types";
 
-export default function VideoCard({ video }) {
+interface VideoCardProps {
+  video: Video;
+}
+
+export default function VideoCard({ video }: VideoCardProps) {
   return (
     <Card style={{ padding: 0, overflow: "hidden" }}>
       <iframe

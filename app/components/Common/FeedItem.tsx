@@ -1,6 +1,12 @@
 import Button from "./Button";
+import type { Post } from "../../types";
 
-export default function FeedItem({ post, onVote }) {
+interface FeedItemProps {
+  post: Post;
+  onVote: (id: number) => void;
+}
+
+export default function FeedItem({ post, onVote }: FeedItemProps) {
   return (
     <article className="feed-item">
       <div className="row">

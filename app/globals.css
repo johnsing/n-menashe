@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* ---------- Reset & Base ---------- */
 *,
 *::before,
@@ -14,25 +16,25 @@
   --surface-hover: #f3f4f6;
   --primary: #111827;
   --primary-fg: #ffffff;
-  --accent: #6366f1;
-  --radius: 10px;
-  --radius-sm: 6px;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
-  --max-width: 900px;
+  --accent: #9333ea;
+  --radius: 16px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --max-width: 680px;
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0f0f10;
-    --fg: #f3f4f6;
-    --muted: #9ca3af;
-    --border: #26272b;
+    --bg: #09090b;
+    --fg: #f4f4f5;
+    --muted: #a1a1aa;
+    --border: #27272a;
     --surface: #18181b;
-    --surface-hover: #1f2023;
-    --primary: #f3f4f6;
-    --primary-fg: #111827;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --surface-hover: #27272a;
+    --primary: #f4f4f5;
+    --primary-fg: #09090b;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   }
 }
 
@@ -48,6 +50,7 @@ body {
   color: var(--fg);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  padding-bottom: 6rem;
 }
 
 a {
@@ -81,7 +84,7 @@ small,
 .container {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 2rem 1.25rem;
+  padding: 2.5rem 1.25rem;
 }
 
 .page-header {
@@ -95,8 +98,15 @@ small,
 
 /* ---------- Navigation ---------- */
 .nav {
-  background: #0a0a0a;
-  border-bottom: 1px solid #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .nav-brand {
@@ -108,7 +118,7 @@ small,
 }
 
 .nav-date {
-  color: #a3a3a3;
+  color: var(--muted);
   font-size: 0.9rem;
 }
 
@@ -127,23 +137,23 @@ small,
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
-  padding: 1rem;
+  padding: 1rem 1.25rem;
   box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease;
 }
 
 .card-hover:hover {
   background: var(--surface-hover);
-  transition: background 0.15s;
+  border-color: var(--muted);
 }
 
 .grid {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-}
-
-.grid-videos {
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 }
 
 .stack {
@@ -160,18 +170,21 @@ small,
 
 /* ---------- Buttons ---------- */
 .btn {
-  padding: 0.65rem 1.1rem;
-  border: 1px solid transparent;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: var(--primary);
-  color: var(--primary-fg);
-  font-size: 0.95rem;
+  background: var(--surface);
+  color: var(--fg);
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: all 0.15s ease;
+  box-shadow: var(--shadow);
 }
 
 .btn:hover {
-  opacity: 0.9;
+  background: var(--surface-hover);
+  border-color: var(--muted);
 }
 
 .btn-ghost {
@@ -185,81 +198,17 @@ small,
 /* ---------- Inputs ---------- */
 .input {
   flex: 1;
-  padding: 0.7rem 0.9rem;
+  padding: 0.6rem 0.9rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--bg);
   color: var(--fg);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .input:focus {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
-}
-
-/* ---------- Media ---------- */
-.video-embed {
-  width: 100%;
-  height: 180px;
-  border: 0;
-  display: block;
-}
-
-audio {
-  width: 100%;
-  margin-top: 0.75rem;
-}
-
-/* ---------- Feed ---------- */
-.feed-item {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  padding: 1rem;
-}
-
-.feed-avatar {
-  font-size: 1.5rem;
-}
-
-.feed-actions {
-  display: flex;
-  gap: 1rem;
-  font-size: 0.9rem;
-  color: var(--muted);
-  margin-top: 0.75rem;
-}
-
-/* ---------- Calendar ---------- */
-.event {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  padding: 1rem;
-}
-
-.event-date {
-  min-width: 72px;
-  text-align: center;
-  border-right: 1px solid var(--border);
-  padding-right: 1rem;
-}
-
-.event-day {
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.event-month {
-  font-size: 0.8rem;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 /* ---------- Floating Tab Bar ---------- */
@@ -319,7 +268,6 @@ audio {
   letter-spacing: 0.01em;
 }
 
-/* Hide labels on small screens to keep it compact */
 @media (max-width: 480px) {
   .tabbar-label {
     display: none;
@@ -327,9 +275,4 @@ audio {
   .tabbar-item {
     padding: 0.55rem 0.65rem;
   }
-}
-
-/* Prevent content from being hidden behind the tab bar */
-body {
-  padding-bottom: 6rem;
 }

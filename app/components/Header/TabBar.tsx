@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const tabs = [
+interface Tab {
+  href: string;
+  label: string;
+  icon: string;
+}
+
+const tabs: Tab[] = [
   { href: "/", label: "Home", icon: "🏠" },
   { href: "/library", label: "Library", icon: "📚" },
   { href: "/videos", label: "Videos", icon: "🎬" },

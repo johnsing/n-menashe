@@ -1,6 +1,11 @@
 import Card from "./Card";
+import type { Track } from "../../types";
 
-export default function AudioCard({ track }) {
+interface AudioCardProps {
+  track: Track;
+}
+
+export default function AudioCard({ track }: AudioCardProps) {
   return (
     <Card>
       <div className="row" style={{ justifyContent: "space-between" }}>

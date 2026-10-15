@@ -3,9 +3,9 @@
 import { useSyncExternalStore } from "react";
 import { HDate } from "@hebcal/core";
 
-const subscribe = () => () => {};
-const getHebrewDate = () => new HDate(new Date()).toString();
-const getServerHebrewDate = () => "";
+const subscribe = (): (() => void) => () => {};
+const getHebrewDate = (): string => new HDate(new Date()).toString();
+const getServerHebrewDate = (): string => "";
 
 export default function Nav() {
   const hebrewDate = useSyncExternalStore(
