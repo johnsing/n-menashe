@@ -1,113 +1,143 @@
 // components/TimelineStation.tsx
-'use client';
+import styled from 'styled-components'
+import { FiClock, FiMapPin } from 'react-icons/fi'
+import AnimatedWifi from '@/app/components/icons/AnimatedWifi'
+import { getWifiStatus, formatCountdown } from '@/app/utils/wifiStatus'
 
-import React from 'react';
-import styled from 'styled-components';
-import { FiRss } from 'react-icons/fi';
-
-interface TimelineStationProps {
-  label: string;
-  time: string;
-  status: 'past' | 'approaching' | 'future';
-  countdownText?: string;
-  isTomorrow?: boolean;
-  icon?: React.ReactNode;
+export interface Station {
+  id: string
+  name: string
+  time: Date | string
+  location?: string
 }
 
-const StationCard = styled.div<{ $status: string }>`
-  background: ${props => props.$status === 'approaching' ? '#f0fdf4' : 'var(--surface, #f3f4f6)'};
-  border: 1px solid ${props => props.$status === 'approaching' ? '#86efac' : 'var(--border, #e5e7eb)'};
-  border-radius: 16px;
-  padding: 14px 20px;
+interface Props {
+  stations: Station[]
+  now: Date
+}
+
+const List = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`
+
+const Row = styled.div<{ $status: 'yellow' | 'green' | 'red' }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: all 0.2s ease;
+  gap: 16px;
+  padding: 14px 18px;
+  background: #1a1a1a;
+  border: 1px solid
+    ${p =>
+      p.$status === 'green'
+        ? 'rgba(81, 207, 102, 0.35)'
+        : p.$status === 'red'
+        ? 'rgba(255, 77, 79, 0.35)'
+        : '#2a2a2a'};
+  border-radius: 12px;
+  transition: all 0.3s ease;
 
   &:hover {
-    background: var(--surface-hover, #e5e7eb);
+    transform: translateX(4px);
+    border-color: rgba(255, 215, 0, 0.35);
   }
-`;
 
-const LeftSection = styled.div`
+  @media (max-width: 480px) {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+`
+
+const Info = styled.div`
+  flex: 1;
+  min-width: 0;
+
+  .name {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+    color: #888;
+    font-size: 12px;
+    flex-wrap: wrap;
+
+    span { display: flex; align-items: center; gap: 4px; }
+    svg { font-size: 11px; }
+  }
+`
+
+const Right = styled.div`
   display: flex;
   align-items: center;
-  gap: 14px;
-`;
+  gap: 12px;
+  flex-shrink: 0;
+`
 
-const IconWrapper = styled.div<{ $status: string }>`
-  font-size: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${props => {
-    if (props.$status === 'approaching') return '#16a34a';
-    if (props.$status === 'past') return '#dc2626';
-    return '#9333ea';
-  }};
-`;
+const Countdown = styled.div<{ $status: string }>`
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  background: ${p =>
+    p.$status === 'green'
+      ? 'rgba(81, 207, 102, 0.15)'
+      : p.$status === 'red'
+      ? 'rgba(255, 77, 79, 0.15)'
+      : 'rgba(255, 215, 0, 0.12)'};
+  color: ${p =>
+    p.$status === 'green' ? '#51cf66' :
+    p.$status === 'red' ? '#ff4d4f' : '#ffd700'};
 
-const LabelText = styled.h2`
-  font-family: serif;
-  font-style: italic;
-  font-size: 1rem;
-  font-weight: 400;
-  color: var(--fg, #1a1a1a);
-  letter-spacing: 0.02em;
-  margin: 0;
-`;
+  @media (max-width: 480px) {
+    display: none;
+  }
+`
 
-const RightSection = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: monospace;
-`;
+export default function TimelineStation({ stations, now }: Props) {
+  const sorted = [...stations].sort(
+    (a, b) => new Date(a.time).getTime() - new Date(b.time).getTime()
+  )
 
-const CountdownSpan = styled.span`
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #16a34a;
-  margin-right: 4px;
-`;
-
-const TomorrowSpan = styled.span`
-  font-size: 0.65rem;
-  color: #9333ea;
-  text-transform: uppercase;
-  font-weight: 600;
-  margin-right: 4px;
-`;
-
-const TimeText = styled.span<{ $status: string }>`
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: ${props => {
-    if (props.$status === 'approaching') return '#16a34a';
-    if (props.$status === 'past') return '#dc2626';
-    return 'var(--fg, #1a1a1a)';
-  }};
-`;
-
-export default function TimelineStation({ label, time, status, countdownText, isTomorrow, icon }: TimelineStationProps) {
   return (
-    <StationCard $status={status}>
-      <LeftSection>
-        <IconWrapper $status={status}>{icon}</IconWrapper>
-        <LabelText>{label}</LabelText>
-      </LeftSection>
+    <List>
+      {sorted.map(station => {
+        const status = getWifiStatus(station.time, now)
+        const countdown = formatCountdown(station.time, now)
+        const timeStr = new Date(station.time).toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        })
 
-      <RightSection>
-        {status === 'approaching' && countdownText && (
-          <CountdownSpan>({countdownText})</CountdownSpan>
-        )}
-        {isTomorrow && status !== 'approaching' && (
-          <TomorrowSpan>(Tomorrow)</TomorrowSpan>
-        )}
-        <FiRss style={{ color: '#9ca3af', fontSize: '14px', transform: 'rotate(90deg)' }} />
-        <TimeText $status={status}>{time}</TimeText>
-      </RightSection>
-    </StationCard>
-  );
+        return (
+          <Row key={station.id} $status={status}>
+            <Info>
+              <div className="name">{station.name}</div>
+              <div className="meta">
+                <span><FiClock /> {timeStr}</span>
+                {station.location && (
+                  <span><FiMapPin /> {station.location}</span>
+                )}
+              </div>
+            </Info>
+
+            <Right>
+              <Countdown $status={status}>{countdown}</Countdown>
+              <AnimatedWifi status={status} size={26} />
+            </Right>
+          </Row>
+        )
+      })}
+    </List>
+  )
 }

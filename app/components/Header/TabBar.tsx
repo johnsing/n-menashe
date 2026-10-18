@@ -25,7 +25,9 @@ export default function TabBar() {
     <nav className="tabbar" aria-label="Primary">
       {tabs.map((tab) => {
         const active =
-          tab.href === "/" ? pathname === "/" : pathname.startsWith(tab.href);
+          tab.href === "/"
+            ? pathname === "/"
+            : pathname === tab.href || pathname.startsWith(tab.href + "/");
 
         return (
           <Link
@@ -33,8 +35,12 @@ export default function TabBar() {
             href={tab.href}
             className={`tabbar-item${active ? " is-active" : ""}`}
             aria-current={active ? "page" : undefined}
+            aria-label={tab.label}       // 👈 for screen readers
+            title={tab.label}            // 👈 hover tooltip
           >
-            <span className="tabbar-icon">{tab.icon}</span>
+            <span className="tabbar-icon" aria-hidden="true">
+              {tab.icon}
+            </span>
           </Link>
         );
       })}
