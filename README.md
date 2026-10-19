@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# N-MENASHE
+
+Heritage library & media — Torah, zmanim, and community. A mobile-first Next.js app with a Hebrew-calendar prayer-time schedule ("Zmanim Train"), the Tanakh library, curated video and audio teachings, and a community Q&A feed.
+
+## Features
+
+- **Zmanim Calendar** — live "train line" schedule of daily services (Shacharit, Mincha, Maariv) with a countdown board, live clock, and animated status indicators
+- **Library** — the books of the Tanakh (Torah, Nevi'im, Ketuvim) with chapter counts
+- **Videos** — curated YouTube teachings on Torah and holidays, embedded responsively
+- **Audio** — shiurim and podcasts with inline players
+- **Q&A** — community feed where visitors can ask questions, answer, and upvote
+- **Hebrew date** in the header, powered by `@hebcal/core`
+- **Fully responsive** — mobile-first layout with a floating tab bar, safe-area support, and dark mode via `prefers-color-scheme`
+
+## Tech Stack
+
+- [Next.js 16](https://nextjs.org) (App Router, Turbopack) + React 19 + TypeScript
+- [Tailwind CSS v4](https://tailwindcss.com) + plain CSS custom properties for theming
+- [styled-components](https://styled-components.com) for the Zmanim transit-board UI
+- [Hebcal](https://github.com/hebcal/hebcal-core) for Hebrew calendar dates
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the dev server |
+| `npm run build` | Production build |
+| `npm start` | Serve the production build |
+| `npm run lint` | Run ESLint |
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```javascript
+app/
+├── page.tsx              # Home
+├── layout.tsx            # Root layout (nav, tab bar, styled-components registry)
+├── globals.css           # Design system (tokens, cards, grids, tab bar)
+├── calendar/             # Zmanim Train schedule
+├── library/              # Tanakh library
+├── videos/               # Video teachings
+├── audio/                # Audio teachings
+├── qa/                   # Community Q&A feed
+├── components/
+│   ├── Header/           # Top nav + floating TabBar
+│   ├── Zmanim/           # Transit board (header, timeline stations)
+│   └── icons/            # Animated WiFi status icon
+├── lib/registry.tsx      # styled-components SSR registry
+└── utils/wifiStatus.ts   # Event status/countdown logic
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The easiest way to deploy is [Vercel](https://vercel.com/new) — the platform from the creators of Next.js. Push to GitHub and import the repo.
 
-## Deploy on Vercel
+## License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT (add a `LICENSE` file if you want others to reuse this code)
