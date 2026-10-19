@@ -1,6 +1,8 @@
-// components/TransitHeader.tsx
+// app/components/Zmanim/TransitHeader.tsx
+"use client";
+
 import styled from 'styled-components'
-import { FiClock, FiMapPin } from 'react-icons/fi'
+import { FiClock, FiMapPin, FiRefreshCw } from 'react-icons/fi'
 import AnimatedWifi from '@/app/components/icons/AnimatedWifi'
 import { getWifiStatus, formatCountdown } from '@/app/utils/wifiStatus'
 
@@ -9,6 +11,7 @@ interface TransitHeaderProps {
   subtitle?: string
   nextEventTime?: Date | string
   location?: string
+  loading?: boolean
 }
 
 const Header = styled.header`
@@ -54,11 +57,11 @@ const TitleBlock = styled.div`
     color: #888;
     font-size: 12px;
     margin-top: 2px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
-    svg { font-size: 12px; }
+    svg { font-size: 12px; vertical-align: -1px; }
   }
 
   @media (max-width: 480px) {
@@ -74,7 +77,7 @@ const StatusBlock = styled.div`
   flex-shrink: 0;
 `
 
-const Countdown = styled.div`
+const Countdown = styled.div<{ $loading?: boolean }>`
   display: flex;
   align-items: center;
   gap: 6px;
@@ -82,9 +85,10 @@ const Countdown = styled.div`
   background: #1a1a1a;
   border: 1px solid #2a2a2a;
   border-radius: 50px;
-  color: #ccc;
+  color: ${p => (p.$loading ? '#666' : '#ccc')};
   font-size: 13px;
   font-weight: 600;
+  white-space: nowrap;
 
   svg { font-size: 14px; color: #ffd700; }
 
@@ -99,6 +103,7 @@ export default function TransitHeader({
   subtitle,
   nextEventTime,
   location,
+  loading = false,
 }: TransitHeaderProps) {
   const status = nextEventTime ? getWifiStatus(nextEventTime) : 'yellow'
   const countdown = nextEventTime ? formatCountdown(nextEventTime) : null
@@ -110,19 +115,19 @@ export default function TransitHeader({
           <h1>{title}</h1>
           {(subtitle || location) && (
             <div className="subtitle">
-              {location && <><FiMapPin /> {location}</>}
-              {location && subtitle && <span>•</span>}
+              {loading && <FiRefreshCw aria-hidden="true" />}
+              {location && <><FiMapPin aria-hidden="true" /> {location}</>}
+              {location && subtitle && <span> · </span>}
               {subtitle}
             </div>
           )}
         </TitleBlock>
 
         <StatusBlock>
-          {countdown && (
-            <Countdown>
-              <FiClock /> {countdown}
-            </Countdown>
-          )}
+          <Countdown $loading={loading} title="Time until next zman">
+            {loading ? <FiRefreshCw aria-hidden="true" /> : <FiClock aria-hidden="true" />}
+            {loading ? 'Updating' : countdown ?? '—'}
+          </Countdown>
           <AnimatedWifi status={status} size={26} />
         </StatusBlock>
       </Row>

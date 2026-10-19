@@ -1,23 +1,104 @@
 // app/components/Zmanim/ZmanimTrainApp.tsx
 "use client";
 
-import { useEffect, useState } from 'react'
-import styled from 'styled-components'
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import styled, { keyframes } from 'styled-components'
+import { FiNavigation } from 'react-icons/fi'
 import TransitHeader from '@/app/components/Zmanim/TransitHeader'
 import TimelineStation, { type Station } from '@/app/components/Zmanim/TimelineStation'
+import {
+  PRESET_LOCATIONS,
+  ALL_PRESET_LOCATIONS,
+  DEFAULT_LOCATION,
+  findPresetLocation,
+  loadSavedLocation,
+  subscribeToSavedLocation,
+  saveLocation,
+  locationFromCoords,
+  isCurrentLocation,
+  type ZmanimLocation,
+} from '@/app/utils/zmanimLocations'
 
-// ── Sample data (replace with API / props) ─────────────────
-const getStations = (now: Date): Station[] => {
-  const base = now.getTime()
-  const min = 60_000
+const API_BASE = 'https://www.hebcal.com/zmanim'
 
-  return [
-    { id: 's1', name: 'Shacharit',        time: new Date(base + 2 * min),  location: 'Main Hall' },
-    { id: 's2', name: 'Torah Study',      time: new Date(base + 8 * min),  location: 'Beit Midrash' },
-    { id: 's3', name: 'Mincha',           time: new Date(base + 20 * min), location: 'Main Hall' },
-    { id: 's4', name: 'Maariv',           time: new Date(base - 10 * min), location: 'Main Hall' },
-    { id: 's5', name: 'Evening Class',    time: new Date(base + 60 * min), location: 'Room 2' },
-  ]
+interface HebcalResponse {
+  date: string
+  location: { title: string }
+  times: Record<string, string>
+}
+
+// Which zmanim appear on the board, in chronological order.
+const ZMANIM_STATIONS: { key: string; name: string; hebrew: string }[] = [
+  { key: 'chatzotNight',     name: 'Chatzot (Midnight)',     hebrew: 'חצות הלילה' },
+  { key: 'alotHaShachar',    name: 'Alot HaShachar',         hebrew: 'עלות השחר' },
+  { key: 'misheyakir',       name: 'Misheyakir (Tallis)',    hebrew: 'משיכיר' },
+  { key: 'sunrise',          name: 'Netz — Sunrise',         hebrew: 'הנץ החמה' },
+  { key: 'sofZmanShmaMGA',   name: 'Latest Shema (MGA)',     hebrew: 'סוף זמן שמע' },
+  { key: 'sofZmanShma',      name: 'Latest Shema (Gra)',     hebrew: 'סוף זמן שמע' },
+  { key: 'sofZmanTfillaMGA', name: 'Latest Shacharit (MGA)', hebrew: 'סוף זמן תפלה' },
+  { key: 'sofZmanTfilla',    name: 'Latest Shacharit (Gra)', hebrew: 'סוף זמן תפלה' },
+  { key: 'chatzot',          name: 'Chatzot (Midday)',       hebrew: 'חצות היום' },
+  { key: 'minchaGedola',     name: 'Mincha Gedola',          hebrew: 'מנחה גדולה' },
+  { key: 'minchaKetana',     name: 'Mincha Ketana',          hebrew: 'מנחה קטנה' },
+  { key: 'plagHaMincha',     name: 'Plag HaMincha',          hebrew: 'פלג המנחה' },
+  { key: 'sunset',           name: 'Shkiah — Sunset',        hebrew: 'שקיעה' },
+  { key: 'beinHaShmashos',   name: 'Bein HaShmashos',        hebrew: 'בין השמשות' },
+  { key: 'tzeit42min',       name: 'Tzeit (42 min)',         hebrew: 'צאת הכוכבים' },
+  { key: 'tzeit72min',       name: 'Tzeit — Rabbeinu Tam',   hebrew: 'ר״ת · 72 דקות' },
+]
+
+const toApiDate = (d: Date): string =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+
+let clockSnapshot: Date | null = null
+let clockInterval: ReturnType<typeof setInterval> | undefined
+const clockSubscribers = new Set<() => void>()
+
+function subscribeToClock(onChange: () => void) {
+  clockSubscribers.add(onChange)
+  if (!clockInterval) {
+    clockSnapshot = new Date()
+    clockInterval = setInterval(() => {
+      clockSnapshot = new Date()
+      clockSubscribers.forEach(subscriber => subscriber())
+    }, 15_000)
+    onChange()
+  }
+
+  return () => {
+    clockSubscribers.delete(onChange)
+    if (clockSubscribers.size === 0 && clockInterval) {
+      clearInterval(clockInterval)
+      clockInterval = undefined
+      clockSnapshot = null
+    }
+  }
+}
+
+const getClockSnapshot = () => clockSnapshot
+const getServerClockSnapshot = () => null
+const getServerLocationSnapshot = () => DEFAULT_LOCATION
+
+async function fetchZmanim(date: Date, loc: ZmanimLocation) {
+  const url = `${API_BASE}?cfg=json&${loc.params}&date=${toApiDate(date)}`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`Hebcal request failed (${res.status})`)
+  const data: HebcalResponse = await res.json()
+
+  const stations: Station[] = ZMANIM_STATIONS
+    .filter(z => data.times[z.key])
+    .map(z => ({
+      id: z.key,
+      name: z.name,
+      hebrew: z.hebrew,
+      time: new Date(data.times[z.key]),
+    }))
+    .sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime())
+
+  return {
+    stations,
+    locationTitle: isCurrentLocation(loc) ? loc.label : (data.location?.title ?? loc.label),
+  }
 }
 
 // ── Styled ────────────────────────────────────────────────
@@ -34,6 +115,79 @@ const Content = styled.main`
   @media (max-width: 768px) {
     padding: 20px 16px 80px;
   }
+`
+
+// ── Location picker ───────────────────────────────────────
+const PickerRow = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+`
+
+const Select = styled.select`
+  flex: 1;
+  min-width: 180px;
+  padding: 10px 16px;
+  background: #1a1a1a;
+  color: #eee;
+  border: 1px solid #2a2a2a;
+  border-radius: 50px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 38px;
+  transition: border-color 0.15s ease;
+
+  &:hover, &:focus {
+    border-color: rgba(255, 215, 0, 0.4);
+    outline: none;
+  }
+
+  option, optgroup {
+    background: #1a1a1a;
+    color: #eee;
+  }
+`
+
+const GeoButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  background: transparent;
+  color: #ffd700;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 215, 0, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  svg { font-size: 14px; }
+`
+
+const GeoHint = styled.p`
+  width: 100%;
+  margin: -8px 0 0 6px;
+  font-size: 12px;
+  color: #ff8080;
 `
 
 const SectionTitle = styled.h2`
@@ -77,46 +231,261 @@ const LiveClock = styled.div`
   }
 
   @media (max-width: 480px) {
+    padding: 18px 12px;
     .time { font-size: 30px; }
   }
 `
 
-// ── App ───────────────────────────────────────────────────
-export default function ZmanimTrainApp() {
-  const [now, setNow] = useState(new Date())
+const pulse = keyframes`
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+`
 
-  // Live tick every 15s
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 15_000)
-    return () => clearInterval(id)
+const Skeleton = styled.div`
+  height: 64px;
+  border-radius: 12px;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  margin-bottom: 10px;
+  animation: ${pulse} 1.4s ease-in-out infinite;
+`
+
+const ErrorBox = styled.div`
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: #ff8080;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 77, 79, 0.35);
+  border-radius: 12px;
+
+  strong { display: block; margin-bottom: 0.4rem; color: #ffb3b3; }
+  small { color: #888; }
+
+  .retry {
+    margin-top: 1rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 50px;
+    border: 1px solid #ffd700;
+    background: transparent;
+    color: #ffd700;
+    font-weight: 700;
+    font-size: 0.85rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s ease;
+
+    &:hover { background: rgba(255, 215, 0, 0.12); }
+  }
+`
+
+const EmptyBox = styled.div`
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: #888;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  font-size: 0.9rem;
+`
+
+// ── App ───────────────────────────────────────────────────
+//
+// Prerender-safe: `new Date()` and localStorage are NEVER read during
+// render. Browser values are read by external-store subscriptions after
+// hydration, keeping Next.js 16's static prerender deterministic.
+export default function ZmanimTrainApp() {
+  const now = useSyncExternalStore(subscribeToClock, getClockSnapshot, getServerClockSnapshot)
+  const location = useSyncExternalStore(
+    subscribeToSavedLocation,
+    loadSavedLocation,
+    getServerLocationSnapshot
+  )
+  const [stations, setStations] = useState<Station[]>([])
+  const [locationTitle, setLocationTitle] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [geoLoading, setGeoLoading] = useState(false)
+  const [geoError, setGeoError] = useState<string | null>(null)
+
+  const load = useCallback(async (date: Date, loc: ZmanimLocation) => {
+    try {
+      const result = await fetchZmanim(date, loc)
+      setStations(result.stations)
+      setLocationTitle(result.locationTitle)
+      setError(null)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load zmanim')
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
-  const stations = getStations(now)
-  const nextStation = [...stations]
-    .filter(s => new Date(s.time).getTime() > now.getTime())
-    .sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime())[0]
+  const dateKey = now ? toApiDate(now) : ''
+
+  // Fetch on mount, location changes, and local date changes.
+  useEffect(() => {
+    if (!dateKey) return
+    let active = true
+    const date = new Date(`${dateKey}T00:00:00`)
+
+    const refresh = async () => {
+      try {
+        const result = await fetchZmanim(date, location)
+        if (!active) return
+        setStations(result.stations)
+        setLocationTitle(result.locationTitle)
+        setError(null)
+      } catch (e) {
+        if (active) setError(e instanceof Error ? e.message : 'Failed to load zmanim')
+      } finally {
+        if (active) setLoading(false)
+      }
+    }
+
+    void refresh()
+    return () => {
+      active = false
+    }
+  }, [dateKey, location])
+
+  // ── Location handlers (event handlers — safe) ──────────
+  const choosePreset = (id: string) => {
+    const loc = findPresetLocation(id)
+    if (!loc) return
+    setGeoError(null)
+    setLoading(true)
+    setError(null)
+    saveLocation(loc)
+  }
+
+  const useMyLocation = () => {
+    if (!('geolocation' in navigator)) {
+      setGeoError('Geolocation is not supported by this browser.')
+      return
+    }
+    setGeoLoading(true)
+    setGeoError(null)
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        const loc = locationFromCoords(pos.coords.latitude, pos.coords.longitude)
+        setLoading(true)
+        setError(null)
+        saveLocation(loc)
+        setGeoLoading(false)
+      },
+      err => {
+        setGeoLoading(false)
+        setGeoError(
+          err.code === err.PERMISSION_DENIED
+            ? 'Location permission denied — choose a city from the list instead.'
+            : 'Could not determine your location. Try again or pick a city.'
+        )
+      },
+      { timeout: 10_000, maximumAge: 300_000 }
+    )
+  }
+
+  // Next upcoming zman (across the whole day)
+  const nextStation = useMemo(() => {
+    if (!now) return null
+    return stations.find(s => new Date(s.time).getTime() > now.getTime()) ?? null
+  }, [stations, now])
+
+  // Train-board behaviour: keep the last hour + everything upcoming
+  const visible = useMemo(() => {
+    if (!now) return []
+    const cutoff = now.getTime() - 60 * 60_000
+    return stations.filter(s => new Date(s.time).getTime() >= cutoff)
+  }, [stations, now])
+
+  // If the saved location isn't one of the presets (e.g. an old save),
+  // offer it as an extra option so the select never shows a blank value.
+  const isPreset = ALL_PRESET_LOCATIONS.some(l => l.id === location.id)
+
+  const selectOptions = (
+    <>
+      {isCurrentLocation(location) && (
+        <option value="current">📍 Current location</option>
+      )}
+      {!isCurrentLocation(location) && !isPreset && (
+        <option value={location.id}>{location.label}</option>
+      )}
+      {PRESET_LOCATIONS.map(group => (
+        <optgroup key={group.group} label={group.group}>
+          {group.locations.map(l => (
+            <option key={l.id} value={l.id}>{l.label}</option>
+          ))}
+        </optgroup>
+      ))}
+    </>
+  )
 
   return (
     <App>
       <TransitHeader
         title="Zmanim Train"
-        subtitle={`${stations.length} upcoming`}
-        location="Jerusalem"
-        nextEventTime={nextStation?.time}
+        subtitle={error ? 'Offline' : `${visible.length} stops · today`}
+        location={locationTitle || location.label}
+        nextEventTime={now ? nextStation?.time : undefined}
+        loading={loading}
       />
 
       <Content>
+        {/* Location picker */}
+        <PickerRow>
+          <Select
+            value={location.id}
+            onChange={e => choosePreset(e.target.value)}
+            aria-label="Choose location"
+          >
+            {selectOptions}
+          </Select>
+          <GeoButton type="button" onClick={useMyLocation} disabled={geoLoading}>
+            <FiNavigation aria-hidden="true" />
+            {geoLoading ? 'Locating…' : 'Use my location'}
+          </GeoButton>
+          {geoError && <GeoHint role="alert">{geoError}</GeoHint>}
+        </PickerRow>
+
         <LiveClock>
           <div className="time">
-            {now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {now ? now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
           </div>
           <div className="date">
-            {now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}
+            {now
+              ? now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })
+              : 'Loading…'}
           </div>
         </LiveClock>
 
-        <SectionTitle>Schedule</SectionTitle>
-        <TimelineStation stations={stations} now={now} />
+        <SectionTitle>Today&apos;s Zmanim</SectionTitle>
+
+        {error ? (
+          <ErrorBox>
+            <strong>Couldn&apos;t reach Hebcal</strong>
+            <small>{error}</small>
+            <div>
+              <button className="retry" onClick={() => {
+                setLoading(true)
+                setError(null)
+                void load(now ?? new Date(), location)
+              }}>
+                Try again
+              </button>
+            </div>
+          </ErrorBox>
+        ) : loading && stations.length === 0 ? (
+          <>
+            <Skeleton />
+            <Skeleton />
+            <Skeleton />
+            <Skeleton />
+          </>
+        ) : visible.length === 0 ? (
+          <EmptyBox>All of today&apos;s zmanim have passed. Tomorrow&apos;s times arrive at midnight. 🌙</EmptyBox>
+        ) : (
+          <TimelineStation stations={visible} now={now ?? new Date()} nextId={nextStation?.id} />
+        )}
       </Content>
     </App>
   )
