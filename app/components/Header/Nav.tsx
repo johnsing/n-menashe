@@ -11,11 +11,11 @@ export default function Nav() {
   const hebrewDate = useSyncExternalStore(
     subscribe,
     getHebrewDate,
-    getServerHebrewDate,
+    getServerHebrewDate
   );
 
   return (
-    <nav className="nav" style={{ justifyContent: "space-around" }}>
+    <nav className="nav">
       <span className="nav-brand">N-MENASHE</span>
       <span className="nav-date">{hebrewDate}</span>
     </nav>

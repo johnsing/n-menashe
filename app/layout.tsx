@@ -1,11 +1,26 @@
 // app/layout.tsx
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Nav from "./components/Header/Nav";
+import TabBar from "./components/Header/TabBar";
+import StyledComponentsRegistry from "./lib/registry";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "N-MENASHE",
+  title: {
+    default: "N-MENASHE",
+    template: "%s | N-MENASHE",
+  },
   description: "Heritage library & media",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
+  ],
 };
 
 export default function RootLayout({
@@ -16,8 +31,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Nav />
-        <main>{children}</main>
+        <StyledComponentsRegistry>
+          <Nav />
+          <div className="site-content">{children}</div>
+          <TabBar />
+        </StyledComponentsRegistry>
       </body>
     </html>
   );

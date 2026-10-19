@@ -1,4 +1,6 @@
-// pages/ZmanimTrainApp.tsx
+// app/components/Zmanim/ZmanimTrainApp.tsx
+"use client";
+
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import TransitHeader from '@/app/components/Zmanim/TransitHeader'

@@ -21,6 +21,7 @@
   --radius-sm: 8px;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
   --max-width: 680px;
+  --max-width-wide: 1080px;
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
@@ -44,13 +45,20 @@ body {
   margin: 0;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   font-family: var(--font-sans);
   background: var(--bg);
   color: var(--fg);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
-  padding-bottom: 6rem;
+  -webkit-tap-highlight-color: transparent;
+  /* Space for the floating tab bar + iPhone home-indicator safe area */
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  overflow-x: hidden;
 }
 
 a {
@@ -67,7 +75,7 @@ h1, h2, h3, h4 {
   margin: 0 0 0.5rem;
 }
 
-h1 { font-size: 1.875rem; }
+h1 { font-size: clamp(1.5rem, 1rem + 2vw, 1.875rem); }
 h2 { font-size: 1.5rem; }
 h3 { font-size: 1.125rem; }
 
@@ -80,11 +88,46 @@ small,
   color: var(--muted);
 }
 
+img,
+iframe,
+video {
+  max-width: 100%;
+}
+
+audio {
+  width: 100%;
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* ---------- Layout ---------- */
 .container {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 2.5rem 1.25rem;
+  padding: 1.5rem 1rem 2.5rem;
+}
+
+.container-wide {
+  max-width: var(--max-width-wide);
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding: 2.5rem 1.25rem;
+  }
+}
+
+.site-content {
+  min-height: 60vh;
 }
 
 .page-header {
@@ -100,8 +143,9 @@ small,
 .nav {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
-  padding: 0.75rem 1.25rem;
+  padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
   position: sticky;
@@ -109,17 +153,33 @@ small,
   z-index: 10;
 }
 
+@media (min-width: 640px) {
+  .nav {
+    padding: 0.75rem 1.25rem;
+  }
+}
+
 .nav-brand {
   font-weight: 900;
-  font-size: 1.35rem;
+  font-size: clamp(1.1rem, 1rem + 1vw, 1.35rem);
   letter-spacing: 0.1em;
   color: #f5c518;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .nav-date {
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 420px) {
+  .nav-date {
+    display: none;
+  }
 }
 
 .nav a {
@@ -132,6 +192,39 @@ small,
   color: var(--fg);
 }
 
+/* ---------- Home ---------- */
+.hero {
+  text-align: center;
+  padding: clamp(1.5rem, 5vw, 3rem) 0 2.5rem;
+}
+
+.hero p {
+  margin: 0;
+}
+
+.home-card {
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  text-align: left;
+}
+
+.home-card:hover {
+  color: inherit;
+  border-color: var(--accent);
+}
+
+.home-card h3 {
+  margin: 0 0 0.15rem;
+  font-size: 1.05rem;
+}
+
+.home-card-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
 /* ---------- Cards & Grids ---------- */
 .card {
   border: 1px solid var(--border);
@@ -140,9 +233,16 @@ small,
   padding: 1rem 1.25rem;
   box-shadow: var(--shadow);
   display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+/* Horizontal variant — use when a card is a single-line row */
+.card-row {
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  transition: all 0.2s ease;
 }
 
 .card-hover:hover {
@@ -153,7 +253,11 @@ small,
 .grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
+}
+
+.grid-videos {
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
 }
 
 .stack {
@@ -168,8 +272,31 @@ small,
   gap: 0.75rem;
 }
 
+/* Forms: stack gracefully on narrow screens */
+.form-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+@media (max-width: 560px) {
+  .form-row {
+    flex-wrap: wrap;
+  }
+  .form-row .input {
+    flex-basis: 100%;
+  }
+  .form-row .btn {
+    flex: 1;
+  }
+}
+
 /* ---------- Buttons ---------- */
 .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 40px;
   padding: 0.6rem 1rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -178,7 +305,7 @@ small,
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease;
   box-shadow: var(--shadow);
 }
 
@@ -192,12 +319,14 @@ small,
   color: var(--fg);
   border: none;
   padding: 0.25rem 0.5rem;
+  min-height: 36px;
   cursor: pointer;
 }
 
 /* ---------- Inputs ---------- */
 .input {
   flex: 1;
+  min-width: 0;
   padding: 0.6rem 0.9rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -211,10 +340,41 @@ small,
   outline-offset: 1px;
 }
 
+/* ---------- Q&A answer box ---------- */
+.answer-box {
+  color: var(--muted);
+  font-size: 0.9rem;
+  background: var(--bg);
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ---------- Video embeds ---------- */
+.video-embed {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  height: auto;
+}
+
+/* ---------- 404 ---------- */
+.not-found {
+  text-align: center;
+  padding-top: clamp(2rem, 10vh, 5rem);
+}
+
+.not-found .btn {
+  margin-top: 1.25rem;
+}
+
 /* ---------- Floating Tab Bar ---------- */
 .tabbar {
   position: fixed;
-  bottom: 1.25rem;
+  bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
@@ -222,6 +382,7 @@ small,
   display: flex;
   gap: 0.25rem;
   padding: 0.4rem;
+  max-width: calc(100vw - 1.5rem);
 
   background: var(--bg);
   border: 1px solid var(--border);
@@ -239,6 +400,8 @@ small,
   justify-content: center;
   gap: 0.15rem;
 
+  min-width: 44px;
+  min-height: 44px;
   padding: 0.45rem 0.75rem;
   border-radius: 999px;
 
@@ -274,5 +437,12 @@ small,
   }
   .tabbar-item {
     padding: 0.55rem 0.65rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .tabbar-item {
+    min-width: 40px;
+    padding: 0.5rem 0.5rem;
   }
 }

@@ -2,15 +2,15 @@
 import type { Track } from "../types";
 
 const tracks: Track[] = [
-  { 
-    title: "Daily Shacharit & Halacha Briefing", 
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", 
-    duration: "14:20" 
+  {
+    title: "Daily Shacharit & Halacha Briefing",
+    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    duration: "14:20"
   },
-  { 
-    title: "Weekly Parsha Insights & Shiur", 
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", 
-    duration: "32:15" 
+  {
+    title: "Weekly Parsha Insights & Shiur",
+    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    duration: "32:15"
   },
 ];
 
@@ -24,13 +24,13 @@ export default function AudioPage() {
 
       <div className="stack">
         {tracks.map((t) => (
-          <div key={t.title} className="card">
-            <div className="row" style={{ justifyContent: "space-between", marginBottom: "0.5rem" }}>
+          <article key={t.title} className="card">
+            <div className="row" style={{ justifyContent: "space-between" }}>
               <strong>{t.title}</strong>
               <small className="muted">{t.duration}</small>
             </div>
-            <audio controls src={t.src} style={{ width: "100%", marginTop: "0.5rem" }} />
-          </div>
+            <audio controls src={t.src} preload="none" />
+          </article>
         ))}
       </div>
     </main>

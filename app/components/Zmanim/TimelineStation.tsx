@@ -1,4 +1,6 @@
-// components/TimelineStation.tsx
+// app/components/Zmanim/TimelineStation.tsx
+"use client";
+
 import styled from 'styled-components'
 import { FiClock, FiMapPin } from 'react-icons/fi'
 import AnimatedWifi from '@/app/components/icons/AnimatedWifi'
@@ -37,10 +39,9 @@ const Row = styled.div<{ $status: 'yellow' | 'green' | 'red' }>`
         ? 'rgba(255, 77, 79, 0.35)'
         : '#2a2a2a'};
   border-radius: 12px;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease;
 
   &:hover {
-    transform: translateX(4px);
     border-color: rgba(255, 215, 0, 0.35);
   }
 
@@ -100,7 +101,8 @@ const Countdown = styled.div<{ $status: string }>`
     p.$status === 'red' ? '#ff4d4f' : '#ffd700'};
 
   @media (max-width: 480px) {
-    display: none;
+    padding: 3px 8px;
+    font-size: 11px;
   }
 `
 

@@ -1,4 +1,4 @@
-// app/qa/page.tsx (or your page file)
+// app/qa/page.tsx
 "use client";
 
 import { useState, type FormEvent } from "react";
@@ -49,45 +49,32 @@ export default function QAPage() {
         <p>Ask questions and share insights with the community</p>
       </header>
 
-      <form onSubmit={submitQuestion} className="row" style={{ marginBottom: "2rem", gap: "0.75rem" }}>
+      <form onSubmit={submitQuestion} className="form-row" style={{ marginBottom: "2rem" }}>
         <input
           className="input"
           value={newQuestion}
           onChange={(e) => setNewQuestion(e.target.value)}
           placeholder="Ask a question or share a thought…"
         />
-        <button className="btn" type="submit" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+        <button className="btn" type="submit">
           <FiSend /> Post
         </button>
       </form>
 
       <div className="stack">
         {posts.map((p) => (
-          <article key={p.id} className="card" style={{ display: "block", padding: "1.25rem" }}>
-            <div className="row" style={{ marginBottom: "0.75rem", gap: "0.5rem" }}>
-              <span style={{ fontSize: "1.25rem" }}>{p.avatar}</span>
+          <article key={p.id} className="card">
+            <div className="row" style={{ gap: "0.5rem" }}>
+              <span style={{ fontSize: "1.25rem" }} aria-hidden="true">{p.avatar}</span>
               <strong style={{ fontSize: "0.95rem" }}>{p.author}</strong>
             </div>
-            
-            <h3 style={{ fontSize: "1.05rem", fontWeight: 600, marginBottom: "0.75rem" }}>{p.question}</h3>
-            
-            {p.answer && (
-              <p style={{ 
-                color: "var(--muted)", 
-                fontSize: "0.9rem", 
-                background: "var(--bg)", 
-                padding: "0.85rem 1rem", 
-                borderRadius: "8px", 
-                borderLeft: "3px solid var(--accent)", 
-                marginBottom: "0.75rem",
-                lineHeight: "1.5"
-              }}>
-                {p.answer}
-              </p>
-            )}
+
+            <h3 style={{ fontSize: "1.05rem", fontWeight: 600, margin: 0 }}>{p.question}</h3>
+
+            {p.answer && <p className="answer-box">{p.answer}</p>}
 
             {replyingTo === p.id ? (
-              <form onSubmit={(e) => submitReply(e, p.id)} className="row" style={{ marginTop: "0.75rem", gap: "0.5rem" }}>
+              <form onSubmit={(e) => submitReply(e, p.id)} className="form-row">
                 <input
                   className="input"
                   value={replyText}
@@ -98,17 +85,17 @@ export default function QAPage() {
                 <button type="button" className="btn-ghost" onClick={() => setReplyingTo(null)}>Cancel</button>
               </form>
             ) : (
-              <div className="feed-actions" style={{ display: "flex", gap: "1.25rem", marginTop: "0.75rem", fontSize: "0.85rem" }}>
-                <button 
-                  className="btn-ghost" 
-                  onClick={() => vote(p.id)} 
+              <div className="row" style={{ gap: "1.25rem" }}>
+                <button
+                  className="btn-ghost"
+                  onClick={() => vote(p.id)}
                   style={{ cursor: "pointer", display: "flex", gap: "5px", alignItems: "center", color: "var(--muted)" }}
                 >
                   <FiThumbsUp /> {p.votes}
                 </button>
-                <button 
-                  className="btn-ghost" 
-                  onClick={() => { setReplyingTo(p.id); setReplyText(p.answer || ""); }} 
+                <button
+                  className="btn-ghost"
+                  onClick={() => { setReplyingTo(p.id); setReplyText(p.answer || ""); }}
                   style={{ cursor: "pointer", display: "flex", gap: "5px", alignItems: "center", color: "var(--muted)" }}
                 >
                   <FiMessageSquare /> {p.answer ? "Edit Answer" : "Answer"}
