@@ -1,7 +1,5 @@
-// app/components/Zmanim/TimelineStation.tsx
 "use client";
 
-import styled, { css } from 'styled-components'
 import { FiClock } from 'react-icons/fi'
 import AnimatedWifi from '@/app/components/icons/AnimatedWifi'
 import { getWifiStatus, formatCountdown } from '@/app/utils/wifiStatus'
@@ -23,121 +21,17 @@ interface Props {
 
 type Status = 'yellow' | 'green' | 'red'
 
-const statusBorder = (s: Status, next: boolean): string => {
-  if (next) return 'rgba(255, 215, 0, 0.65)'
-  if (s === 'green') return 'rgba(81, 207, 102, 0.35)'
-  if (s === 'red') return 'rgba(255, 77, 79, 0.35)'
-  return '#2a2a2a'
+const BORDER: Record<Status, string> = {
+  green:  'border-[rgba(81,207,102,0.35)]',
+  red:    'border-[rgba(255,77,79,0.35)]',
+  yellow: 'border-board-border',
 }
 
-const List = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`
-
-const Row = styled.div<{ $status: Status; $next: boolean }>`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 14px 18px;
-  background: ${p => (p.$next ? '#1e1a10' : '#1a1a1a')};
-  border: 1px solid ${p => statusBorder(p.$status, p.$next)};
-  border-radius: 12px;
-  transition: border-color 0.3s ease, background 0.3s ease;
-  ${p =>
-    p.$next &&
-    css`
-      box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.1), 0 0 20px rgba(255, 215, 0, 0.07);
-    `}
-
-  &:hover {
-    border-color: rgba(255, 215, 0, 0.45);
-  }
-
-  @media (max-width: 480px) {
-    padding: 12px 14px;
-    gap: 10px;
-  }
-`
-
-const Info = styled.div`
-  flex: 1;
-  min-width: 0;
-
-  .name {
-    color: #fff;
-    font-size: 15px;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .heb {
-    color: #777;
-    font-size: 12px;
-    font-weight: 400;
-    margin-left: 6px;
-  }
-
-  .meta {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 4px;
-    color: #888;
-    font-size: 12px;
-    flex-wrap: wrap;
-
-    span { display: flex; align-items: center; gap: 4px; }
-    svg { font-size: 11px; }
-  }
-`
-
-const Right = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-`
-
-const Countdown = styled.div<{ $status: Status }>`
-  padding: 4px 12px;
-  border-radius: 50px;
-  font-size: 12px;
-  font-weight: 700;
-  white-space: nowrap;
-  background: ${p =>
-    p.$status === 'green'
-      ? 'rgba(81, 207, 102, 0.15)'
-      : p.$status === 'red'
-      ? 'rgba(255, 77, 79, 0.15)'
-      : 'rgba(255, 215, 0, 0.12)'};
-  color: ${p =>
-    p.$status === 'green' ? '#51cf66' :
-    p.$status === 'red' ? '#ff4d4f' : '#ffd700'};
-
-  @media (max-width: 480px) {
-    padding: 3px 8px;
-    font-size: 11px;
-  }
-`
-
-const NextBadge = styled.span`
-  display: inline-block;
-  margin-left: 8px;
-  padding: 2px 8px;
-  border-radius: 50px;
-  background: rgba(255, 215, 0, 0.15);
-  color: #ffd700;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  vertical-align: 2px;
-`
+const PILL: Record<Status, string> = {
+  green:  'bg-[rgba(81,207,102,0.15)] text-status-green',
+  red:    'bg-[rgba(255,77,79,0.15)] text-status-red',
+  yellow: 'bg-[rgba(255,215,0,0.12)] text-gold',
+}
 
 export default function TimelineStation({ stations, now, nextId }: Props) {
   const sorted = [...stations].sort(
@@ -145,7 +39,7 @@ export default function TimelineStation({ stations, now, nextId }: Props) {
   )
 
   return (
-    <List>
+    <div className="flex flex-col gap-2.5">
       {sorted.map(station => {
         const status = getWifiStatus(station.time, now)
         const countdown = formatCountdown(station.time, now)
@@ -156,26 +50,45 @@ export default function TimelineStation({ stations, now, nextId }: Props) {
         })
 
         return (
-          <Row key={station.id} $status={status} $next={isNext}>
-            <Info>
-              <div className="name">
+          <div
+            key={station.id}
+            className={`flex items-center justify-between gap-4 rounded-xl border px-[18px] py-3.5 transition-colors duration-300 hover:border-[rgba(255,215,0,0.45)] max-sm:gap-2.5 max-sm:px-3.5 max-sm:py-3 ${
+              isNext
+                ? 'border-[rgba(255,215,0,0.65)] bg-board-surface-next shadow-[0_0_0_1px_rgba(255,215,0,0.1),0_0_20px_rgba(255,215,0,0.07)]'
+                : `bg-board-surface ${BORDER[status]}`
+            }`}
+          >
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-[15px] font-semibold text-white">
                 {station.name}
-                {station.hebrew && <span className="heb" lang="he">{station.hebrew}</span>}
-                {isNext && <NextBadge>Next</NextBadge>}
+                {station.hebrew && (
+                  <span className="ml-1.5 text-xs font-normal text-[#777]" lang="he">
+                    {station.hebrew}
+                  </span>
+                )}
+                {isNext && (
+                  <span className="ml-2 inline-block translate-y-[2px] rounded-full bg-[rgba(255,215,0,0.15)] px-2 py-0.5 align-baseline text-[10px] font-extrabold uppercase tracking-[0.08em] text-gold">
+                    Next
+                  </span>
+                )}
               </div>
-              <div className="meta">
-                <span><FiClock aria-hidden="true" /> {timeStr}</span>
+              <div className="mt-1 flex flex-wrap items-center gap-2.5 text-xs text-[#888]">
+                <span className="flex items-center gap-1 [&_svg]:text-[11px]">
+                  <FiClock aria-hidden="true" /> {timeStr}
+                </span>
                 {station.location && <span>{station.location}</span>}
               </div>
-            </Info>
+            </div>
 
-            <Right>
-              <Countdown $status={status}>{countdown}</Countdown>
+            <div className="flex flex-shrink-0 items-center gap-3">
+              <div className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold max-sm:px-2 max-sm:py-0.5 max-sm:text-[11px] ${PILL[status]}`}>
+                {countdown}
+              </div>
               <AnimatedWifi status={status} size={26} />
-            </Right>
-          </Row>
+            </div>
+          </div>
         )
       })}
-    </List>
+    </div>
   )
 }

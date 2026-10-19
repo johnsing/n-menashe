@@ -2,7 +2,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react'
-import styled, { keyframes } from 'styled-components'
 import { FiNavigation } from 'react-icons/fi'
 import TransitHeader from '@/app/components/Zmanim/TransitHeader'
 import TimelineStation, { type Station } from '@/app/components/Zmanim/TimelineStation'
@@ -100,193 +99,6 @@ async function fetchZmanim(date: Date, loc: ZmanimLocation) {
     locationTitle: isCurrentLocation(loc) ? loc.label : (data.location?.title ?? loc.label),
   }
 }
-
-// ── Styled ────────────────────────────────────────────────
-const App = styled.div`
-  min-height: 100vh;
-  background: #0a0a0a;
-`
-
-const Content = styled.main`
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 24px 20px 80px;
-
-  @media (max-width: 768px) {
-    padding: 20px 16px 80px;
-  }
-`
-
-// ── Location picker ───────────────────────────────────────
-const PickerRow = styled.div`
-  display: flex;
-  gap: 10px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-`
-
-const Select = styled.select`
-  flex: 1;
-  min-width: 180px;
-  padding: 10px 16px;
-  background: #1a1a1a;
-  color: #eee;
-  border: 1px solid #2a2a2a;
-  border-radius: 50px;
-  font-size: 14px;
-  font-family: inherit;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 16px center;
-  padding-right: 38px;
-  transition: border-color 0.15s ease;
-
-  &:hover, &:focus {
-    border-color: rgba(255, 215, 0, 0.4);
-    outline: none;
-  }
-
-  option, optgroup {
-    background: #1a1a1a;
-    color: #eee;
-  }
-`
-
-const GeoButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 18px;
-  border-radius: 50px;
-  border: 1px solid rgba(255, 215, 0, 0.4);
-  background: transparent;
-  color: #ffd700;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s ease;
-
-  &:hover:not(:disabled) {
-    background: rgba(255, 215, 0, 0.1);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: default;
-  }
-
-  svg { font-size: 14px; }
-`
-
-const GeoHint = styled.p`
-  width: 100%;
-  margin: -8px 0 0 6px;
-  font-size: 12px;
-  color: #ff8080;
-`
-
-const SectionTitle = styled.h2`
-  color: #fff;
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  &::before {
-    content: '';
-    width: 4px;
-    height: 16px;
-    background: #ffd700;
-    border-radius: 2px;
-  }
-`
-
-const LiveClock = styled.div`
-  text-align: center;
-  padding: 24px;
-  background: linear-gradient(135deg, #1a1a1a, #141414);
-  border: 1px solid #2a2a2a;
-  border-radius: 16px;
-  margin-bottom: 24px;
-
-  .time {
-    color: #ffd700;
-    font-size: 42px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .date {
-    color: #888;
-    font-size: 13px;
-    margin-top: 4px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 18px 12px;
-    .time { font-size: 30px; }
-  }
-`
-
-const pulse = keyframes`
-  0%, 100% { opacity: 0.5; }
-  50%      { opacity: 1; }
-`
-
-const Skeleton = styled.div`
-  height: 64px;
-  border-radius: 12px;
-  background: #1a1a1a;
-  border: 1px solid #2a2a2a;
-  margin-bottom: 10px;
-  animation: ${pulse} 1.4s ease-in-out infinite;
-`
-
-const ErrorBox = styled.div`
-  padding: 2rem 1.5rem;
-  text-align: center;
-  color: #ff8080;
-  background: #1a1a1a;
-  border: 1px solid rgba(255, 77, 79, 0.35);
-  border-radius: 12px;
-
-  strong { display: block; margin-bottom: 0.4rem; color: #ffb3b3; }
-  small { color: #888; }
-
-  .retry {
-    margin-top: 1rem;
-    padding: 0.5rem 1.25rem;
-    border-radius: 50px;
-    border: 1px solid #ffd700;
-    background: transparent;
-    color: #ffd700;
-    font-weight: 700;
-    font-size: 0.85rem;
-    font-family: inherit;
-    cursor: pointer;
-    transition: background 0.15s ease;
-
-    &:hover { background: rgba(255, 215, 0, 0.12); }
-  }
-`
-
-const EmptyBox = styled.div`
-  padding: 2rem 1.5rem;
-  text-align: center;
-  color: #888;
-  background: #1a1a1a;
-  border: 1px solid #2a2a2a;
-  border-radius: 12px;
-  font-size: 0.9rem;
-`
 
 // ── App ───────────────────────────────────────────────────
 //
@@ -421,7 +233,7 @@ export default function ZmanimTrainApp() {
   )
 
   return (
-    <App>
+    <div className="min-h-screen bg-board-bg">
       <TransitHeader
         title="Zmanim Train"
         subtitle={error ? 'Offline' : `${visible.length} stops · today`}
@@ -430,63 +242,80 @@ export default function ZmanimTrainApp() {
         loading={loading}
       />
 
-      <Content>
+      <main className="mx-auto w-full max-w-[900px] px-5 pb-20 pt-6 max-md:px-4">
         {/* Location picker */}
-        <PickerRow>
-          <Select
+        <div className="mb-6 flex flex-wrap gap-2.5">
+          <select
+            className="zmanim-select min-w-[180px] flex-1 cursor-pointer rounded-full border border-board-border bg-board-surface py-2.5 pl-4 pr-9 text-sm text-[#eee] transition-colors hover:border-[rgba(255,215,0,0.4)] focus:border-[rgba(255,215,0,0.4)] focus:outline-none"
             value={location.id}
             onChange={e => choosePreset(e.target.value)}
             aria-label="Choose location"
           >
             {selectOptions}
-          </Select>
-          <GeoButton type="button" onClick={useMyLocation} disabled={geoLoading}>
+          </select>
+          <button
+            type="button"
+            onClick={useMyLocation}
+            disabled={geoLoading}
+            className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[rgba(255,215,0,0.4)] bg-transparent px-[18px] py-2.5 font-[inherit] text-[13px] font-semibold text-gold transition-colors hover:bg-[rgba(255,215,0,0.1)] disabled:cursor-default disabled:opacity-50 [&_svg]:text-sm"
+          >
             <FiNavigation aria-hidden="true" />
             {geoLoading ? 'Locating…' : 'Use my location'}
-          </GeoButton>
-          {geoError && <GeoHint role="alert">{geoError}</GeoHint>}
-        </PickerRow>
+          </button>
+          {geoError && (
+            <p role="alert" className="-mt-2 mb-0 ml-1.5 w-full text-xs text-[#ff8080]">
+              {geoError}
+            </p>
+          )}
+        </div>
 
-        <LiveClock>
-          <div className="time">
+        <div className="mb-6 rounded-2xl border border-board-border bg-gradient-to-br from-[#1a1a1a] to-[#141414] px-6 py-5 text-center max-sm:px-3 max-sm:py-4">
+          <div className="text-[42px] font-extrabold tracking-wider text-gold tabular-nums max-sm:text-3xl">
             {now ? now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
           </div>
-          <div className="date">
+          <div className="mt-1 text-[13px] text-[#888]">
             {now
               ? now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })
               : 'Loading…'}
           </div>
-        </LiveClock>
+        </div>
 
-        <SectionTitle>Today&apos;s Zmanim</SectionTitle>
+        <h2 className="mb-3.5 flex items-center gap-2 text-base font-bold text-white before:h-4 before:w-1 before:rounded-sm before:bg-gold before:content-['']">
+          Today&apos;s Zmanim
+        </h2>
 
         {error ? (
-          <ErrorBox>
-            <strong>Couldn&apos;t reach Hebcal</strong>
-            <small>{error}</small>
+          <div className="rounded-xl border border-[rgba(255,77,79,0.35)] bg-board-surface px-6 py-8 text-center text-[#ff8080]">
+            <strong className="mb-1.5 block text-[#ffb3b3]">Couldn&apos;t reach Hebcal</strong>
+            <small className="text-[#888]">{error}</small>
             <div>
-              <button className="retry" onClick={() => {
-                setLoading(true)
-                setError(null)
-                void load(now ?? new Date(), location)
-              }}>
+              <button
+                className="mt-4 cursor-pointer rounded-full border border-gold bg-transparent px-5 py-2 font-[inherit] text-sm font-bold text-gold transition-colors hover:bg-[rgba(255,215,0,0.12)]"
+                onClick={() => {
+                  setLoading(true)
+                  setError(null)
+                  void load(now ?? new Date(), location)
+                }}
+              >
                 Try again
               </button>
             </div>
-          </ErrorBox>
+          </div>
         ) : loading && stations.length === 0 ? (
           <>
-            <Skeleton />
-            <Skeleton />
-            <Skeleton />
-            <Skeleton />
+            <div className="mb-2.5 h-16 animate-pulse rounded-xl border border-board-border bg-board-surface" />
+            <div className="mb-2.5 h-16 animate-pulse rounded-xl border border-board-border bg-board-surface" />
+            <div className="mb-2.5 h-16 animate-pulse rounded-xl border border-board-border bg-board-surface" />
+            <div className="mb-2.5 h-16 animate-pulse rounded-xl border border-board-border bg-board-surface" />
           </>
         ) : visible.length === 0 ? (
-          <EmptyBox>All of today&apos;s zmanim have passed. Tomorrow&apos;s times arrive at midnight. 🌙</EmptyBox>
+          <div className="rounded-xl border border-board-border bg-board-surface px-6 py-8 text-center text-sm text-[#888]">
+            All of today&apos;s zmanim have passed. Tomorrow&apos;s times arrive at midnight. 🌙
+          </div>
         ) : (
           <TimelineStation stations={visible} now={now ?? new Date()} nextId={nextStation?.id} />
         )}
-      </Content>
-    </App>
+      </main>
+    </div>
   )
 }

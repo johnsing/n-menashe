@@ -2,7 +2,6 @@
 import type { Metadata, Viewport } from "next";
 import Nav from "./components/Header/Nav";
 import TabBar from "./components/Header/TabBar";
-import StyledComponentsRegistry from "./lib/registry";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,19 +22,13 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <StyledComponentsRegistry>
-          <Nav />
-          <div className="site-content">{children}</div>
-          <TabBar />
-        </StyledComponentsRegistry>
+        <Nav />
+        <div className="site-content">{children}</div>
+        <TabBar />
       </body>
     </html>
   );

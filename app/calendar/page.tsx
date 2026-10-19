@@ -6,18 +6,7 @@ export default function CalendarPage() {
   return (
     <Suspense
       fallback={
-        <div
-          style={{
-            minHeight: '60vh',
-            background: '#0a0a0a',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#ffd700',
-            fontSize: 14,
-            letterSpacing: 1,
-          }}
-        >
+        <div className="flex min-h-[60vh] items-center justify-center bg-board-bg text-sm tracking-wider text-gold">
           LOADING ZMANIM…
         </div>
       }

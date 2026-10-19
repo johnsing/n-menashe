@@ -2,20 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { IconType } from "react-icons";
+import { FiHome, FiBook, FiVideo, FiHeadphones, FiMessageSquare, FiCalendar } from "react-icons/fi";
 
 interface Tab {
   href: string;
   label: string;
-  icon: string;
+  Icon: IconType;
 }
 
 const tabs: Tab[] = [
-  { href: "/", label: "Home", icon: "🏠" },
-  { href: "/library", label: "Library", icon: "📚" },
-  { href: "/videos", label: "Videos", icon: "🎬" },
-  { href: "/audio", label: "Audio", icon: "🎧" },
-  { href: "/qa", label: "Q&A", icon: "💬" },
-  { href: "/calendar", label: "Calendar", icon: "📅" },
+  { href: "/", label: "Home", Icon: FiHome },
+  { href: "/library", label: "Library", Icon: FiBook },
+  { href: "/videos", label: "Videos", Icon: FiVideo },
+  { href: "/audio", label: "Audio", Icon: FiHeadphones },
+  { href: "/qa", label: "Q&A", Icon: FiMessageSquare },
+  { href: "/calendar", label: "Calendar", Icon: FiCalendar },
 ];
 
 export default function TabBar() {
@@ -35,11 +37,11 @@ export default function TabBar() {
             href={tab.href}
             className={`tabbar-item${active ? " is-active" : ""}`}
             aria-current={active ? "page" : undefined}
-            aria-label={tab.label}       // 👈 for screen readers
-            title={tab.label}            // 👈 hover tooltip
+            aria-label={tab.label}
+            title={tab.label}
           >
             <span className="tabbar-icon" aria-hidden="true">
-              {tab.icon}
+              <tab.Icon />
             </span>
           </Link>
         );
