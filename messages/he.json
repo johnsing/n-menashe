@@ -1,0 +1,64 @@
+{
+  "nav": {
+    "home": "בית",
+    "library": "ספרייה",
+    "videos": "וידאו",
+    "audio": "שמע",
+    "qa": "שאלות ותשובות",
+    "calendar": "לוח זמנים"
+  },
+  "home": {
+    "heroTitle": "ברוכים הבאים לנ-מנשה",
+    "heroSubtitle": "ספריית מורשת ומדיה — תורה, זמנים וקהילה.",
+    "zmanimTitle": "לוח זמני התפילה",
+    "zmanimDesc": "זמני תפילה ולוח יומי",
+    "libraryTitle": "ספרייה",
+    "libraryDesc": "כתבי הקודש — תנ״ך",
+    "videosTitle": "וידאו",
+    "videosDesc": "שיעורים ולימודי חגים",
+    "audioTitle": "שמע",
+    "audioDesc": "שיעורים, תפילה ופודקאסטים",
+    "qaTitle": "שאלות ותשובות",
+    "qaDesc": "שאלו את הקהילה"
+  },
+  "zmanim": {
+    "title": "רכבת הזמנים",
+    "chooseLocation": "בחר מיקום",
+    "useMyLocation": "המיקום שלי",
+    "locating": "מאתר…",
+    "todaysZmanim": "זמני היום",
+    "next": "הבא",
+    "tryAgain": "נסה שוב",
+    "offline": "לא מקוון",
+    "couldntReach": "לא ניתן להתחבר ל-Hebcal",
+    "allPassed": "כל זמני היום עברו. זמני מחר יתקבלו בחצות."
+  },
+  "library": {
+    "title": "ספריית המורשת",
+    "subtitle": "ספרי התנ״ך",
+    "torah": "תורה",
+    "neviim": "נביאים",
+    "ketuvim": "כתובים",
+    "chapters": "{count, plural, one {פרק #} other {# פרקים}}"
+  },
+  "videos": {
+    "title": "שיעורי תורה וחגים",
+    "subtitle": "שיעורי וידאו, סקירות חגים וקורסים",
+    "watchOnYoutube": "צפה ב-YouTube ↗"
+  },
+  "audio": {
+    "title": "שיעורי שמע",
+    "subtitle": "דברי תורה, שיעורים ופודקאסטים"
+  },
+  "qa": {
+    "title": "קהילת שאלות ותשובות",
+    "subtitle": "שאלו שאלות ושתפו תובנות עם הקהילה",
+    "placeholder": "שאלו שאלה או שתפו מחשבה…",
+    "post": "פרסם",
+    "writeAnswer": "כתוב תשובה...",
+    "reply": "הגב",
+    "cancel": "ביטול",
+    "editAnswer": "ערוך תשובה",
+    "answer": "ענה"
+  }
+}

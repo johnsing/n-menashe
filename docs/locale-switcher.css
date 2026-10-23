@@ -1,0 +1,35 @@
+/* ── Locale switcher ─────────────────────────────────────────
+   Append this block to the END of app/globals.css.
+   Fixed pill in the top corner; flips side automatically in RTL. */
+
+.locale-switcher {
+  position: fixed;
+  top: max(10px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 200;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 215, 0, 0.25);
+  background: rgba(20, 20, 20, 0.85);
+  color: #ffd700;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.locale-switcher:hover {
+  border-color: rgba(255, 215, 0, 0.55);
+  background: rgba(30, 30, 30, 0.9);
+}
+
+[dir="rtl"] .locale-switcher {
+  right: auto;
+  left: max(12px, env(safe-area-inset-left));
+}

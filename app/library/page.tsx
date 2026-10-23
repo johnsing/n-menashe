@@ -1,4 +1,5 @@
 // app/library/page.tsx
+import { useTranslations } from "next-intl";
 import type { Book } from "../types";
 
 const b = (name: string, chapters: number): Book => ({
@@ -56,22 +57,26 @@ const ketuvim: Book[] = [
 ];
 
 const sections = [
-  { title: "Torah", books: torah },
-  { title: "Prophets (Nevi'im)", books: neviim },
-  { title: "Writings (Ketuvim)", books: ketuvim },
+  { titleKey: "torah", books: torah },
+  { titleKey: "neviim", books: neviim },
+  { titleKey: "ketuvim", books: ketuvim },
 ];
 
 export default function LibraryPage() {
+  const t = useTranslations("library");
+
   return (
     <main className="container container-wide">
       <header className="page-header">
-        <h1>Heritage Library</h1>
-        <p>The books of the Tanakh</p>
+        <h1>{t("title")}</h1>
+        <p>{t("subtitle")}</p>
       </header>
 
       {sections.map((section) => (
-        <section key={section.title} style={{ marginBottom: "2.5rem" }}>
-          <h2 style={{ fontSize: "1.15rem", marginBottom: "0.75rem" }}>{section.title}</h2>
+        <section key={section.titleKey} style={{ marginBottom: "2.5rem" }}>
+          <h2 style={{ fontSize: "1.15rem", marginBottom: "0.75rem" }}>
+            {t(section.titleKey)}
+          </h2>
           <div className="grid">
             {section.books.map((book) => (
               <div
@@ -80,9 +85,7 @@ export default function LibraryPage() {
                 style={{ padding: "0.85rem 1rem", cursor: "pointer" }}
               >
                 <strong style={{ fontSize: "0.95rem" }}>{book.name}</strong>
-                <small className="muted">
-                  {book.chapters} chapter{book.chapters === 1 ? "" : "s"}
-                </small>
+                <small className="muted">{t("chapters", { count: book.chapters })}</small>
               </div>
             ))}
           </div>

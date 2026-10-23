@@ -1,7 +1,11 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from "next";
+import { getLocale, getMessages } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
 import Nav from "./components/Header/Nav";
 import TabBar from "./components/Header/TabBar";
+import LocaleSwitcher from "./components/Header/LocaleSwitcher";
+import StyledComponentsRegistry from "./lib/registry";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -22,13 +26,25 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en">
+    <html lang={locale} dir={locale === "he" ? "rtl" : "ltr"}>
       <body>
-        <Nav />
-        <div className="site-content">{children}</div>
-        <TabBar />
+        <NextIntlClientProvider messages={messages}>
+          <StyledComponentsRegistry>
+            <Nav />
+            <LocaleSwitcher />
+            <div className="site-content">{children}</div>
+            <TabBar />
+          </StyledComponentsRegistry>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

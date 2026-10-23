@@ -1,0 +1,64 @@
+{
+  "nav": {
+    "home": "Home",
+    "library": "Library",
+    "videos": "Videos",
+    "audio": "Audio",
+    "qa": "Q&A",
+    "calendar": "Calendar"
+  },
+  "home": {
+    "heroTitle": "Welcome to N-MENASHE",
+    "heroSubtitle": "Heritage library & media — Torah, zmanim, and community.",
+    "zmanimTitle": "Zmanim Calendar",
+    "zmanimDesc": "Prayer times & daily schedule",
+    "libraryTitle": "Library",
+    "libraryDesc": "Scriptures of the Tanakh",
+    "videosTitle": "Videos",
+    "videosDesc": "Teachings & holiday lessons",
+    "audioTitle": "Audio",
+    "audioDesc": "Shiurim, worship & podcasts",
+    "qaTitle": "Q&A",
+    "qaDesc": "Ask the community"
+  },
+  "zmanim": {
+    "title": "Zmanim Train",
+    "chooseLocation": "Choose location",
+    "useMyLocation": "Use my location",
+    "locating": "Locating…",
+    "todaysZmanim": "Today's Zmanim",
+    "next": "Next",
+    "tryAgain": "Try again",
+    "offline": "Offline",
+    "couldntReach": "Couldn't reach Hebcal",
+    "allPassed": "All of today's zmanim have passed. Tomorrow's times arrive at midnight."
+  },
+  "library": {
+    "title": "Heritage Library",
+    "subtitle": "The books of the Tanakh",
+    "torah": "Torah",
+    "neviim": "Prophets (Nevi'im)",
+    "ketuvim": "Writings (Ketuvim)",
+    "chapters": "{count, plural, one {# chapter} other {# chapters}}"
+  },
+  "videos": {
+    "title": "Torah & Holiday Teachings",
+    "subtitle": "Explore video lessons, holiday overviews, and classes",
+    "watchOnYoutube": "Watch on YouTube ↗"
+  },
+  "audio": {
+    "title": "Audio Teachings",
+    "subtitle": "Devotions, shiurim, worship, and podcasts"
+  },
+  "qa": {
+    "title": "Q&A Community Feed",
+    "subtitle": "Ask questions and share insights with the community",
+    "placeholder": "Ask a question or share a thought…",
+    "post": "Post",
+    "writeAnswer": "Write an answer...",
+    "reply": "Reply",
+    "cancel": "Cancel",
+    "editAnswer": "Edit Answer",
+    "answer": "Answer"
+  }
+}

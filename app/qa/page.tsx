@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useTranslations } from "next-intl";
 import { FiMessageSquare, FiThumbsUp, FiSend } from "react-icons/fi";
 
 interface Post {
@@ -13,12 +14,28 @@ interface Post {
   votes: number;
 }
 
+// Seed content matches the app's Tanakh/Torah focus.
 const initialPosts: Post[] = [
-  { id: 1, author: "Mary", avatar: "👩", question: "What does 'grace' mean in Ephesians 2:8?", answer: "God's unmerited favor — a gift, not earned by works.", votes: 12 },
-  { id: 2, author: "David", avatar: "👨", question: "How do I start reading the Bible?", answer: "Start with John, then Romans, then Genesis.", votes: 8 },
+  {
+    id: 1,
+    author: "Miriam",
+    avatar: "👩",
+    question: "What does 'chesed' mean in Genesis 24:12?",
+    answer: "Loving-kindness — faithful covenant loyalty, beyond mere kindness.",
+    votes: 12,
+  },
+  {
+    id: 2,
+    author: "David",
+    avatar: "👨",
+    question: "How do I start reading the Torah regularly?",
+    answer: "Begin with the weekly parasha — one portion a week with a commentary like Rashi or Sforno.",
+    votes: 8,
+  },
 ];
 
 export default function QAPage() {
+  const t = useTranslations("qa");
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [newQuestion, setNewQuestion] = useState("");
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
@@ -27,7 +44,17 @@ export default function QAPage() {
   const submitQuestion = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!newQuestion.trim()) return;
-    setPosts([{ id: Date.now(), author: "You", avatar: "🙂", question: newQuestion, answer: "", votes: 0 }, ...posts]);
+    setPosts([
+      {
+        id: Date.now(),
+        author: "You",
+        avatar: "🙂",
+        question: newQuestion,
+        answer: "",
+        votes: 0,
+      },
+      ...posts,
+    ]);
     setNewQuestion("");
   };
 
@@ -45,8 +72,8 @@ export default function QAPage() {
   return (
     <main className="container">
       <header className="page-header">
-        <h1>Q&amp;A Community Feed</h1>
-        <p>Ask questions and share insights with the community</p>
+        <h1>{t("title")}</h1>
+        <p>{t("subtitle")}</p>
       </header>
 
       <form onSubmit={submitQuestion} className="form-row" style={{ marginBottom: "2rem" }}>
@@ -54,10 +81,10 @@ export default function QAPage() {
           className="input"
           value={newQuestion}
           onChange={(e) => setNewQuestion(e.target.value)}
-          placeholder="Ask a question or share a thought…"
+          placeholder={t("placeholder")}
         />
         <button className="btn" type="submit">
-          <FiSend /> Post
+          <FiSend /> {t("post")}
         </button>
       </form>
 
@@ -65,11 +92,15 @@ export default function QAPage() {
         {posts.map((p) => (
           <article key={p.id} className="card">
             <div className="row" style={{ gap: "0.5rem" }}>
-              <span style={{ fontSize: "1.25rem" }} aria-hidden="true">{p.avatar}</span>
+              <span style={{ fontSize: "1.25rem" }} aria-hidden="true">
+                {p.avatar}
+              </span>
               <strong style={{ fontSize: "0.95rem" }}>{p.author}</strong>
             </div>
 
-            <h3 style={{ fontSize: "1.05rem", fontWeight: 600, margin: 0 }}>{p.question}</h3>
+            <h3 style={{ fontSize: "1.05rem", fontWeight: 600, margin: 0 }}>
+              {p.question}
+            </h3>
 
             {p.answer && <p className="answer-box">{p.answer}</p>}
 
@@ -79,26 +110,49 @@ export default function QAPage() {
                   className="input"
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
-                  placeholder="Write an answer..."
+                  placeholder={t("writeAnswer")}
                 />
-                <button className="btn" type="submit" style={{ fontSize: "0.85rem", padding: "0.5rem 0.9rem" }}>Reply</button>
-                <button type="button" className="btn-ghost" onClick={() => setReplyingTo(null)}>Cancel</button>
+                <button
+                  className="btn"
+                  type="submit"
+                  style={{ fontSize: "0.85rem", padding: "0.5rem 0.9rem" }}
+                >
+                  {t("reply")}
+                </button>
+                <button type="button" className="btn-ghost" onClick={() => setReplyingTo(null)}>
+                  {t("cancel")}
+                </button>
               </form>
             ) : (
               <div className="row" style={{ gap: "1.25rem" }}>
                 <button
                   className="btn-ghost"
                   onClick={() => vote(p.id)}
-                  style={{ cursor: "pointer", display: "flex", gap: "5px", alignItems: "center", color: "var(--muted)" }}
+                  style={{
+                    cursor: "pointer",
+                    display: "flex",
+                    gap: "5px",
+                    alignItems: "center",
+                    color: "var(--muted)",
+                  }}
                 >
                   <FiThumbsUp /> {p.votes}
                 </button>
                 <button
                   className="btn-ghost"
-                  onClick={() => { setReplyingTo(p.id); setReplyText(p.answer || ""); }}
-                  style={{ cursor: "pointer", display: "flex", gap: "5px", alignItems: "center", color: "var(--muted)" }}
+                  onClick={() => {
+                    setReplyingTo(p.id);
+                    setReplyText(p.answer || "");
+                  }}
+                  style={{
+                    cursor: "pointer",
+                    display: "flex",
+                    gap: "5px",
+                    alignItems: "center",
+                    color: "var(--muted)",
+                  }}
                 >
-                  <FiMessageSquare /> {p.answer ? "Edit Answer" : "Answer"}
+                  <FiMessageSquare /> {p.answer ? t("editAnswer") : t("answer")}
                 </button>
               </div>
             )}

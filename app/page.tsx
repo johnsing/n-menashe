@@ -1,19 +1,23 @@
-import Link from "next/link";
+// app/page.tsx
+import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
 const sections = [
-  { href: "/calendar", icon: "📅", title: "Zmanim Calendar", desc: "Prayer times & daily schedule" },
-  { href: "/library", icon: "📚", title: "Library", desc: "Scriptures of the Tanakh" },
-  { href: "/videos", icon: "🎬", title: "Videos", desc: "Teachings & holiday lessons" },
-  { href: "/audio", icon: "🎧", title: "Audio", desc: "Shiurim, worship & podcasts" },
-  { href: "/qa", icon: "💬", title: "Q&A", desc: "Ask the community" },
-];
+  { href: "/calendar", icon: "📅", titleKey: "zmanimTitle", descKey: "zmanimDesc" },
+  { href: "/library", icon: "📚", titleKey: "libraryTitle", descKey: "libraryDesc" },
+  { href: "/videos", icon: "🎬", titleKey: "videosTitle", descKey: "videosDesc" },
+  { href: "/audio", icon: "🎧", titleKey: "audioTitle", descKey: "audioDesc" },
+  { href: "/qa", icon: "💬", titleKey: "qaTitle", descKey: "qaDesc" },
+] as const;
 
 export default function HomePage() {
+  const t = useTranslations("home");
+
   return (
     <main className="container">
       <section className="hero">
-        <h1>Welcome to N-MENASHE</h1>
-        <p className="muted">Heritage library &amp; media — Torah, zmanim, and community.</p>
+        <h1>{t("heroTitle")}</h1>
+        <p className="muted">{t("heroSubtitle")}</p>
       </section>
 
       <div className="grid">
@@ -23,8 +27,8 @@ export default function HomePage() {
               {s.icon}
             </span>
             <div>
-              <h3>{s.title}</h3>
-              <small className="muted">{s.desc}</small>
+              <h3>{t(s.titleKey)}</h3>
+              <small className="muted">{t(s.descKey)}</small>
             </div>
           </Link>
         ))}

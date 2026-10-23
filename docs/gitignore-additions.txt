@@ -1,0 +1,10 @@
+# ── Append these lines to .gitignore ────────────────────────
+
+# Vitest / Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Serwist generates this at build time — never commit it
+public/sw.js
