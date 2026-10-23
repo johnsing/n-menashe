@@ -1,25 +1,26 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { Link, usePathname } from "@/i18n/navigation";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import type { IconType } from "react-icons";
+import { FiHome, FiBook, FiVideo, FiHeadphones, FiMessageSquare, FiCalendar } from "react-icons/fi";
 
 interface Tab {
   href: string;
-  key: string;
-  icon: string;
+  label: string;
+  Icon: IconType;
 }
 
 const tabs: Tab[] = [
-  { href: "/", key: "home", icon: "🏠" },
-  { href: "/library", key: "library", icon: "📚" },
-  { href: "/videos", key: "videos", icon: "🎬" },
-  { href: "/audio", key: "audio", icon: "🎧" },
-  { href: "/qa", key: "qa", icon: "💬" },
-  { href: "/calendar", key: "calendar", icon: "📅" },
+  { href: "/", label: "Home", Icon: FiHome },
+  { href: "/library", label: "Library", Icon: FiBook },
+  { href: "/videos", label: "Videos", Icon: FiVideo },
+  { href: "/audio", label: "Audio", Icon: FiHeadphones },
+  { href: "/qa", label: "Q&A", Icon: FiMessageSquare },
+  { href: "/calendar", label: "Calendar", Icon: FiCalendar },
 ];
 
 export default function TabBar() {
-  const t = useTranslations("nav");
   const pathname = usePathname();
 
   return (
@@ -36,11 +37,11 @@ export default function TabBar() {
             href={tab.href}
             className={`tabbar-item${active ? " is-active" : ""}`}
             aria-current={active ? "page" : undefined}
-            aria-label={t(tab.key)}
-            title={t(tab.key)}
+            aria-label={tab.label}
+            title={tab.label}
           >
             <span className="tabbar-icon" aria-hidden="true">
-              {tab.icon}
+              <tab.Icon />
             </span>
           </Link>
         );

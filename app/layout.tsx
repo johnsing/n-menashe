@@ -7,6 +7,7 @@ import TabBar from "./components/Header/TabBar";
 import LocaleSwitcher from "./components/Header/LocaleSwitcher";
 import StyledComponentsRegistry from "./lib/registry";
 import "./globals.css";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: {
@@ -26,14 +27,21 @@ export const viewport: Viewport = {
   ],
 };
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html suppressHydrationWarning>
+      <body>
+        <Suspense fallback={null}>
+          <LayoutInner>{children}</LayoutInner>
+        </Suspense>
+      </body>
+    </html>
+  );
+}
+
+async function LayoutInner({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
   const messages = await getMessages();
-
   return (
     <html lang={locale} dir={locale === "he" ? "rtl" : "ltr"}>
       <body>
